@@ -33,7 +33,8 @@
     <!-- Example row of columns -->
     <div id="chooseroot" class="row">
       <div class="col-md-8">
-        <p>Try searching for a term to see it as the root of a word tree...</p>
+        <h2>Plant your tree!</h2>
+        <p>Search for a term in your selected text to see it as the "root" of a word tree...</p>
         <p><em>Note:</em> Searches are case sensitive (ie. "Clinton" is not the same as "clinton")</p>
         <div id="searchwords"></div>
           <form class="form-inline">
@@ -47,7 +48,9 @@
       <div class="col-md-2">
         <p>Choose your text:</p>
       <select id="textchoice">
-          <option value="house" selected>Mueller Report</option>
+          <option value="mueller" selected>Mueller Report</option>
+          <option value="moby" selected>Moby Dick</option>
+          <option value="scarlet" selected>A Study In Scarlet</option>
         </select>
       </div>
 
@@ -56,10 +59,14 @@
     <hr>
 
   </div> <!-- /container -->
-
-  <div class="container">
-    <div id="wordtree_basic" style="width: 900px; height: 800px;"></div>
-  </div> <!-- /container -->
+<div class="container">
+<div class="row">
+  <div class="col-md-9">
+    <div id="searchresults">Your search for "<span id="term"></span>" in the text of <span id="fulltextname"></span> found <span id="hits"></span> results...</div>
+    <div id="wordtree_basic"></div>
+  </div>
+  </div>
+</div><!-- /container -->
 
   <div id="please-wait" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -89,14 +96,21 @@
 
 (function() {
   $( "#chooseroot" ).hide();
+  $( "#searchresults" ).hide();
   var mytext;
   var phrases = [];
+  var locations = {
+    moby: "https://raw.githubusercontent.com/esperr/words-in-the-trees/master/texts/Guttenberg_moby_dick.txt",
+    mueller: "https://raw.githubusercontent.com/esperr/words-in-the-trees/master/texts/mueller-report-poorlyconverted-ocr.txt",
+    scarlet: "https://raw.githubusercontent.com/esperr/words-in-the-trees/master/texts/Guttenberg_study_in_scarlet.txt"
+  }
 
-  $.ajax({
-  url: "https://raw.githubusercontent.com/ReconDaemon/Mueller-Report-OCR/master/mueller-report-poorlyconverted-ocr.txt",
-  }).done(function( data ) {
-    $( "#chooseroot" ).show();
-    mytext = data;
+  var textname = $( "#textchoice" ).val();
+  loadText();
+
+  $( "#textchoice" ).change(function() {
+    textname = $( "#textchoice" ).val();
+    loadText();
   });
 
    $("#ownword").click(function(){
@@ -108,7 +122,13 @@
   function matchdoc (rootword) {
     phrases.length = 0;
     findMatch(mytext, rootword);
-    console.log(phrases);
+    $( "#searchresults" ).show();
+    $( "#term" ).empty();
+    $( "#term" ).append(rootword);
+    $( "#fulltextname" ).empty();
+    $( "#fulltextname" ).append($( "#textchoice option:selected" ).text());    
+    $( "#hits" ).empty();
+    $( "#hits" ).append(phrases.length);
     if (phrases.length > 0) {
       drawChart( rootword );
     } else {
@@ -132,9 +152,20 @@
      }
    }
 
+   function loadText() {
+     $.ajax({
+     url: locations[textname],
+     }).done(function( data ) {
+       $( "#chooseroot" ).show();
+       mytext = data;
+     });
+   }
+
    google.charts.load('current', {packages:['wordtree']});
    function drawChart( myword ) {
-      console.log(phrases);
+      var currentwidth = $("#wordtree_basic").innerWidth();
+      var mystyle = '"width: ' + currentwidth + 'px; height: ' + currentwidth*.888 + 'px;"';
+      $( "#wordtree_basic" ).attr( "style", mystyle );
       var data = google.visualization.arrayToDataTable( phrases );
       var options = {
         wordtree: {
