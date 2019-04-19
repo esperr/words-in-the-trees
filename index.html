@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-433406-14"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-433406-14');
+    </script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Words in the Trees</title>
@@ -49,8 +59,8 @@
         <p>Choose your text:</p>
       <select id="textchoice">
           <option value="mueller" selected>Mueller Report</option>
-          <option value="moby" selected>Moby Dick</option>
-          <option value="scarlet" selected>A Study In Scarlet</option>
+          <option value="moby">Moby Dick</option>
+          <option value="scarlet">A Study In Scarlet</option>
         </select>
       </div>
 
@@ -113,6 +123,17 @@
     loadText();
   });
 
+  $(document).keydown(function(e) {
+    if(e.keyCode == 13) {
+      //Because both IE and FF now "helpfully" ignore the spec and treat 'button' the same as 'submit'
+      e.preventDefault();
+      if($('#chooseroot').is(':visible')){
+        $( "#ownword" ).trigger( "click" );
+      }
+    }
+  });
+
+
    $("#ownword").click(function(){
       $('#wordtree_basic').empty();
       var myword = $("#customword").val();
@@ -126,7 +147,7 @@
     $( "#term" ).empty();
     $( "#term" ).append(rootword);
     $( "#fulltextname" ).empty();
-    $( "#fulltextname" ).append($( "#textchoice option:selected" ).text());    
+    $( "#fulltextname" ).append($( "#textchoice option:selected" ).text());
     $( "#hits" ).empty();
     $( "#hits" ).append(phrases.length);
     if (phrases.length > 0) {
