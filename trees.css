@@ -3,3 +3,8 @@
   padding-top: 5em;
   padding-bottom: 1em;
   }
+
+#fulltextname {
+  font-style: italic;
+  font-weight: bold;
+}
